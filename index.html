@@ -86,6 +86,11 @@ body[data-role="rep"] .my-stat{display:flex}
 .class-chip.sel-A{background:var(--green);border-color:var(--green);color:#fff}
 .class-chip.sel-B{background:var(--amber);border-color:var(--amber);color:#fff}
 .class-chip.sel-C{background:var(--n500);border-color:var(--n500);color:#fff}
+.type-chips{display:flex;gap:8px;flex-wrap:wrap}
+.type-chip{padding:9px 14px;border:2px solid var(--n200);border-radius:var(--radius);background:var(--n50);font-weight:800;font-size:13px;cursor:pointer;transition:.15s;color:var(--n500)}
+.type-chip:hover{border-color:var(--n400)}
+.type-chip.on{background:var(--teal);border-color:var(--teal);color:#fff}
+.dt-badge{font-size:10.5px;font-weight:800;padding:2px 9px;border-radius:9px;background:#E0F7FA;color:var(--teal)}
 
 .dupbox{border-radius:var(--radius);padding:14px 16px;margin-top:10px;font-size:13px;display:none;line-height:1.8}
 .dupbox.dup-exact{display:block;background:var(--red-l);border:2px solid #FCA5A5;color:#991B1B}
@@ -193,7 +198,7 @@ body[data-role="rep"] .my-stat{display:flex}
   <button class="tab active" data-p="add" onclick="switchTab('add')">➕ تسجيل</button>
   <button class="tab" data-p="dir" onclick="switchTab('dir')">📖 الدليل <span class="tb-count" id="tb-count">0</span></button>
   <button class="tab" data-p="stats" onclick="switchTab('stats')">📊 الإحصائيات</button>
-  <button class="tab" data-p="users" onclick="switchTab('users')">👥 المندوبين</button>
+  <button class="tab" data-p="users" onclick="switchTab('users')">⚙️ الإعدادات</button>
 </div>
 
 <main>
@@ -250,6 +255,16 @@ body[data-role="rep"] .my-stat{display:flex}
           <button type="button" class="class-chip" data-c="C">C</button>
         </div>
       </div>
+      <div class="fg full">
+        <label>نوع الطبيب <span class="req">*</span> <span style="font-weight:600;color:var(--n400)">(يمكن اختيار أكثر من نوع)</span></label>
+        <div class="type-chips" id="type-chips">
+          <button type="button" class="type-chip" data-t="ديلر كاش">💰 ديلر كاش</button>
+          <button type="button" class="type-chip" data-t="ساينتفك">🔬 ساينتفك</button>
+          <button type="button" class="type-chip" data-t="KOL">⭐ KOL</button>
+          <button type="button" class="type-chip" data-t="يدور كفت">🎁 يدور كفت</button>
+          <button type="button" class="type-chip" data-t="يدور RDT">🍽️ يدور RDT</button>
+        </div>
+      </div>
       <div class="fg">
         <label>الصيدلية القريبة</label>
         <input id="f-pharm" placeholder="مثال: صيدلية النور">
@@ -279,6 +294,11 @@ body[data-role="rep"] .my-stat{display:flex}
     <select id="q-spec" onchange="renderDir()"><option value="">كل الاختصاصات</option></select>
     <select id="q-area" onchange="renderDir()"><option value="">كل المناطق</option></select>
     <select id="q-rep" onchange="renderDir()"><option value="">كل المندوبين</option></select>
+    <select id="q-type" onchange="renderDir()">
+      <option value="">كل الأنواع</option>
+      <option>ديلر كاش</option><option>ساينتفك</option><option>KOL</option>
+      <option>يدور كفت</option><option>يدور RDT</option>
+    </select>
     <button class="btn-csv" onclick="exportCSV()">⬇ Excel</button>
   </div>
   <div class="doc-list" id="doc-list"></div>
@@ -289,15 +309,21 @@ body[data-role="rep"] .my-stat{display:flex}
   <div class="stat-grid" id="stat-grid"></div>
   <div class="card"><h2>🏆 ترتيب المندوبين</h2><div class="sub">حسب عدد الأطباء المسجّلين</div><div id="rep-board"></div></div>
   <div class="card"><h2>🧬 توزيع الكلاسات</h2><div id="cls-bars" style="margin-top:14px"></div></div>
+  <div class="card"><h2>🏷️ أنواع الأطباء</h2><div id="type-bars" style="margin-top:14px"></div></div>
   <div class="card"><h2>📍 أعلى المناطق</h2><div id="area-bars" style="margin-top:14px"></div></div>
   <div class="card"><h2>🩺 أعلى الاختصاصات</h2><div id="spec-bars" style="margin-top:14px"></div></div>
 </div>
 
-<!-- ═══ USERS (admin) ═══ -->
+<!-- ═══ SETTINGS (admin) ═══ -->
 <div class="panel" id="p-users">
   <div class="card">
+    <h2>🛡️ حساب المشرف</h2>
+    <div class="sub">غيّر اسم المستخدم وكلمة المرور الخاصة بك من هنا</div>
+    <div id="adm-row"></div>
+  </div>
+  <div class="card">
     <h2>👥 إدارة المندوبين</h2>
-    <div class="sub">غيّر الأسماء لأسماء مندوبيك الحقيقية، وأعد تعيين كلمة المرور عند الحاجة، وعطّل أي حساب فوراً</div>
+    <div class="sub">لكل مندوب: غيّر اسمه الحقيقي، اسم المستخدم، كلمة المرور، أو عطّل حسابه فوراً</div>
     <div id="usr-list"></div>
   </div>
 </div>
@@ -383,6 +409,16 @@ document.querySelectorAll('.class-chip').forEach(ch=>{
   };
 });
 
+/* ══════ TYPE CHIPS (multi) ══════ */
+let selTypes = new Set();
+document.querySelectorAll('.type-chip').forEach(ch=>{
+  ch.onclick = ()=>{
+    const t = ch.dataset.t;
+    if(selTypes.has(t)){ selTypes.delete(t); ch.classList.remove('on'); }
+    else { selTypes.add(t); ch.classList.add('on'); }
+  };
+});
+
 /* ══════ LIVE DUP CHECK ══════ */
 let dupTimer=null, isDup=false;
 $('f-name').addEventListener('input', ()=>{
@@ -442,10 +478,12 @@ async function submitDoctor(){
   if(!spec) return toast('اختر الاختصاص','err');
   if(!area) return toast('اختر المنطقة','err');
   if(!selClass) return toast('اختر كلاس الطبيب','err');
+  if(!selTypes.size) return toast('اختر نوع الطبيب (واحد على الأقل)','err');
   $('btn-submit').disabled = true;
   try{
     const res = await rpc('survey_add_doctor',{
       p_token:ME.token, p_name:name, p_specialty:spec, p_area:area, p_class:selClass,
+      p_dtype:[...selTypes].join('، '),
       p_pharmacy:$('f-pharm').value, p_phone:$('f-phone').value, p_notes:$('f-notes').value
     });
     if(res.ok){
@@ -454,6 +492,7 @@ async function submitDoctor(){
       $('my-count').textContent = ME.my_count;
       ['f-name','f-spec','f-area','f-pharm','f-phone','f-notes'].forEach(i=>$(i).value='');
       selClass=null; document.querySelectorAll('.class-chip').forEach(x=>x.className='class-chip');
+      selTypes.clear(); document.querySelectorAll('.type-chip').forEach(x=>x.classList.remove('on'));
       $('dupbox').className='dupbox'; isDup=false;
       if(ME.role==='admin') refresh();
     } else if(res.reason==='duplicate'){
@@ -490,10 +529,11 @@ function fillFilters(){
 }
 const norm = s => (s||'').replace(/[أإآ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي').replace(/^د\.\s*/,'').toLowerCase();
 function renderDir(){
-  const q=norm($('q-search').value.trim()), fc=$('q-class').value, fs=$('q-spec').value, fa=$('q-area').value, fr=$('q-rep').value;
+  const q=norm($('q-search').value.trim()), fc=$('q-class').value, fs=$('q-spec').value, fa=$('q-area').value, fr=$('q-rep').value, ft=$('q-type').value;
   const rows = ALL.filter(d=>
     (!q || norm(d.doctor_name).includes(q) || norm(d.specialty).includes(q) || norm(d.area).includes(q) || norm(d.nearby_pharmacy).includes(q))
-    && (!fc||d.class===fc) && (!fs||d.specialty===fs) && (!fa||d.area===fa) && (!fr||d.rep_name===fr));
+    && (!fc||d.class===fc) && (!fs||d.specialty===fs) && (!fa||d.area===fa) && (!fr||d.rep_name===fr)
+    && (!ft||(d.doctor_type||'').includes(ft)));
   const el = $('doc-list');
   if(!rows.length){ el.innerHTML = `<div class="empty"><div class="em-icon">🔍</div>لا يوجد أطباء ${ALL.length?'مطابقون للبحث':'مسجّلون بعد'}</div>`; return; }
   el.innerHTML = rows.map(d=>`
@@ -508,6 +548,7 @@ function renderDir(){
           ${d.phone?`<span>📱 ${esc(d.phone)}</span>`:''}
           ${d.notes?`<span>📝 ${esc(d.notes)}</span>`:''}
         </div>
+        ${d.doctor_type?`<div class="doc-meta" style="margin-top:6px;gap:5px">${d.doctor_type.split('، ').map(t=>`<span class="dt-badge">${esc(t)}</span>`).join('')}</div>`:''}
       </div>
       <div class="doc-side">
         <span class="cls-badge cls-${d.class.replace('+','plus')}">${d.class}</span>
@@ -539,64 +580,83 @@ function renderStats(){
     <div class="stat-card"><div class="sc-num">${areas.length}</div><div class="sc-lbl">منطقة</div></div>
     <div class="stat-card"><div class="sc-num">${specs.length}</div><div class="sc-lbl">اختصاص</div></div>
     <div class="stat-card"><div class="sc-num">${reps.length}</div><div class="sc-lbl">مندوب مشارك</div></div>`;
-  const max1=Math.max(1,...cls.map(e=>e[1])), max2=Math.max(1,...areas.map(e=>e[1])), max3=Math.max(1,...specs.map(e=>e[1]));
-  bars('cls-bars',cls,max1); bars('area-bars',areas,max2); bars('spec-bars',specs,max3);
+  const tm={}; ALL.forEach(d=>(d.doctor_type||'').split('، ').filter(Boolean).forEach(t=>{tm[t]=(tm[t]||0)+1;}));
+  const types=Object.entries(tm).sort((a,b)=>b[1]-a[1]);
+  const max1=Math.max(1,...cls.map(e=>e[1])), max2=Math.max(1,...areas.map(e=>e[1])), max3=Math.max(1,...specs.map(e=>e[1])), max4=Math.max(1,...types.map(e=>e[1]),1);
+  bars('cls-bars',cls,max1); bars('area-bars',areas,max2); bars('spec-bars',specs,max3); bars('type-bars',types,max4);
   $('rep-board').innerHTML = reps.length? reps.slice(0,10).map(([k,v],i)=>`
     <div class="rep-row"><div class="rep-rank ${i===0?'r1':''}">${i===0?'🥇':i+1}</div>
     <div class="rep-name">${esc(k)}</div><div class="rep-cnt">${v} طبيب</div></div>`).join('')
     : '<div class="empty" style="padding:20px">لا بيانات بعد</div>';
 }
 
-/* ══════ ADMIN: USERS ══════ */
+/* ══════ ADMIN: SETTINGS ══════ */
+const ERR_AR = {invalid_username:'اسم المستخدم غير صالح — أحرف إنجليزية صغيرة وأرقام و _ فقط (3-20 حرفاً)', username_taken:'اسم المستخدم محجوز لحساب آخر', weak_password:'كلمة المرور قصيرة — 4 رموز على الأقل', auth:'انتهت الجلسة', notfound:'الحساب غير موجود'};
+function usrRow(u){
+  const isAdmin = u.role==='admin';
+  return `
+    <div class="usr-row ${u.active?'':'inactive'}">
+      <div class="usr-av">${isAdmin?'🛡️':'👤'}</div>
+      <div class="usr-info">
+        <div class="usr-name">${esc(u.full_name)}</div>
+        <div class="usr-uname">${esc(u.username)}</div>
+      </div>
+      ${isAdmin?'':`<span class="usr-cnt">${u.cnt} طبيب</span>`}
+      <div class="usr-actions">
+        <button class="btn-mini edit" onclick="renameUser('${u.id}','${esc(u.full_name)}')">✏️ الاسم</button>
+        <button class="btn-mini edit" onclick="changeUname('${u.id}','${esc(u.username)}')">🆔 اليوزر</button>
+        <button class="btn-mini pass" onclick="resetPass('${u.id}','${esc(u.full_name)}')">🔑 كلمة السر</button>
+        ${isAdmin?'':`<button class="btn-mini ${u.active?'off':'on'}" onclick="toggleUser('${u.id}',${u.active})">${u.active?'⛔ تعطيل':'✅ تفعيل'}</button>`}
+      </div>
+    </div>`;
+}
 async function loadUsers(){
   try{
     const res = await rpc('survey_admin_users',{p_token:ME.token});
     if(res.error==='auth') return sessionExpired();
-    const users = (res.users||[]).filter(u=>u.role!=='admin');
-    $('usr-list').innerHTML = users.map(u=>`
-      <div class="usr-row ${u.active?'':'inactive'}">
-        <div class="usr-av">👤</div>
-        <div class="usr-info">
-          <div class="usr-name">${esc(u.full_name)}</div>
-          <div class="usr-uname">${esc(u.username)}</div>
-        </div>
-        <span class="usr-cnt">${u.cnt} طبيب</span>
-        <div class="usr-actions">
-          <button class="btn-mini edit" onclick="renameUser('${u.id}','${esc(u.full_name)}')">✏️ الاسم</button>
-          <button class="btn-mini pass" onclick="resetPass('${u.id}','${esc(u.full_name)}')">🔑 كلمة السر</button>
-          <button class="btn-mini ${u.active?'off':'on'}" onclick="toggleUser('${u.id}',${u.active})">${u.active?'⛔ تعطيل':'✅ تفعيل'}</button>
-        </div>
-      </div>`).join('');
+    const users = res.users||[];
+    $('adm-row').innerHTML = users.filter(u=>u.role==='admin').map(usrRow).join('');
+    $('usr-list').innerHTML = users.filter(u=>u.role!=='admin').map(usrRow).join('');
   }catch(e){ toast('خطأ في التحميل','err'); }
 }
+async function setUser(id, args, okMsg){
+  try{
+    const r = await rpc('survey_admin_set_user',{p_token:ME.token, p_user_id:id, ...args});
+    if(r.ok){ toast(okMsg,'ok'); loadUsers(); return true; }
+    toast(ERR_AR[r.reason]||'لم يتم الحفظ','err');
+  }catch(e){ toast('خطأ في الاتصال','err'); }
+  return false;
+}
 async function renameUser(id, cur){
-  const name = prompt('الاسم الحقيقي للمندوب (يظهر مع كل تسجيلاته):', cur);
-  if(!name || !name.trim()) return;
-  await rpc('survey_admin_set_user',{p_token:ME.token, p_user_id:id, p_name:name.trim()});
-  toast('تم تغيير الاسم','ok'); loadUsers();
+  const name = prompt('الاسم الحقيقي (يظهر مع كل التسجيلات):', cur);
+  if(!name || !name.trim() || name.trim()===cur) return;
+  setUser(id, {p_name:name.trim()}, 'تم تغيير الاسم وتحديث كل تسجيلاته');
+}
+async function changeUname(id, cur){
+  const un = prompt('اسم المستخدم الجديد (إنجليزي صغير وأرقام و _ فقط، 3-20 حرفاً):', cur);
+  if(!un || !un.trim() || un.trim()===cur) return;
+  setUser(id, {p_username:un.trim()}, 'تم تغيير اسم المستخدم — أبلغ صاحبه');
 }
 async function resetPass(id, name){
-  if(!confirm('إعادة تعيين كلمة مرور "'+name+'"؟ سيتم تسجيل خروجه من كل الأجهزة.')) return;
-  const np = String(Math.floor(100000 + Math.random()*900000));
-  await rpc('survey_admin_set_user',{p_token:ME.token, p_user_id:id, p_new_password:np});
-  prompt('كلمة المرور الجديدة لـ "'+name+'" — انسخها وأرسلها له:', np);
-  loadUsers();
+  const np = prompt('كلمة المرور الجديدة لـ "'+name+'" (4 رموز على الأقل) — اكتبها أو اترك المقترحة:', String(Math.floor(100000 + Math.random()*900000)));
+  if(!np || np.length<4) return;
+  const ok = await setUser(id, {p_new_password:np}, 'تم تغيير كلمة المرور');
+  if(ok) prompt('انسخ كلمة المرور الجديدة لـ "'+name+'" وأرسلها له:', np);
 }
 async function toggleUser(id, active){
-  await rpc('survey_admin_set_user',{p_token:ME.token, p_user_id:id, p_active:!active});
-  toast(active?'تم تعطيل الحساب':'تم تفعيل الحساب','ok'); loadUsers();
+  setUser(id, {p_active:!active}, active?'تم تعطيل الحساب':'تم تفعيل الحساب');
 }
 
 /* ══════ CSV EXPORT ══════ */
 function exportCSV(){
   if(!ALL.length) return toast('لا توجد بيانات للتصدير','err');
-  const head=['اسم الطبيب','الاختصاص','المنطقة','الكلاس','الصيدلية القريبة','الهاتف','ملاحظات','المندوب','تاريخ التسجيل'];
+  const head=['اسم الطبيب','الاختصاص','المنطقة','الكلاس','نوع الطبيب','الصيدلية القريبة','الهاتف','ملاحظات','المندوب','تاريخ التسجيل'];
   const csvCell = v => {
     let s = String(v??'').replace(/"/g,'""');
     if(/^[=+\-@]/.test(s)) s = "'" + s;
     return `"${s}"`;
   };
-  const rows = ALL.map(d=>[d.doctor_name,d.specialty,d.area,d.class,d.nearby_pharmacy,d.phone,d.notes,d.rep_name,new Date(d.created_at).toLocaleDateString('ar-IQ')].map(csvCell).join(','));
+  const rows = ALL.map(d=>[d.doctor_name,d.specialty,d.area,d.class,d.doctor_type,d.nearby_pharmacy,d.phone,d.notes,d.rep_name,new Date(d.created_at).toLocaleDateString('ar-IQ')].map(csvCell).join(','));
   const blob = new Blob(['﻿'+head.map(csvCell).join(',')+'\n'+rows.join('\n')],{type:'text/csv;charset=utf-8'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
