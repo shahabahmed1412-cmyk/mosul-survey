@@ -29,12 +29,13 @@ input,select,textarea,button{font-family:var(--font);font-size:14px}
 .login-card .lg-icon{font-size:52px;margin-bottom:14px}
 .login-card h1{color:#fff;font-size:24px;font-weight:900;margin-bottom:6px}
 .login-card p{color:rgba(255,255,255,.65);font-size:13px;line-height:1.8;margin-bottom:28px}
-.login-card input{width:100%;padding:13px 16px;border-radius:var(--radius);border:2px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:#fff;margin-bottom:12px;outline:none;transition:.2s}
+.login-card input{width:100%;padding:13px 16px;border-radius:var(--radius);border:2px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:#fff;margin-bottom:12px;outline:none;transition:.2s;direction:ltr;text-align:center}
 .login-card input:focus{border-color:#fff;background:rgba(255,255,255,.15)}
 .login-card input::placeholder{color:rgba(255,255,255,.45)}
 .login-card button{width:100%;padding:14px;background:#fff;color:var(--brand);border:none;border-radius:var(--radius);font-weight:800;font-size:15px;cursor:pointer;transition:.2s}
 .login-card button:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(255,255,255,.25)}
-.login-err{color:#FCA5A5;font-size:12px;margin-top:10px;display:none}
+.login-card button:disabled{opacity:.6;cursor:wait}
+.login-err{color:#FCA5A5;font-size:12.5px;margin-top:12px;display:none;font-weight:700}
 
 /* ══════ HEADER ══════ */
 header{background:#fff;border-bottom:1px solid var(--n200);padding:12px 16px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;box-shadow:0 1px 3px rgba(0,0,0,.06)}
@@ -43,10 +44,12 @@ header{background:#fff;border-bottom:1px solid var(--n200);padding:12px 16px;dis
 .hd-title h1{font-size:16px;font-weight:900;color:var(--n900);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .hd-title p{font-size:11px;color:var(--n500)}
 .hd-user{display:flex;align-items:center;gap:8px;background:var(--brand-l);padding:6px 12px;border-radius:20px;font-size:12px;font-weight:700;color:var(--brand);white-space:nowrap}
+.hd-user.admin{background:var(--purple-l);color:var(--purple)}
 .hd-logout{background:var(--red-l);color:var(--red);border:none;border-radius:9px;padding:8px 10px;cursor:pointer;font-weight:700;font-size:12px}
 
 /* ══════ TABS ══════ */
-.tabs{display:flex;background:#fff;border-bottom:2px solid var(--n200);position:sticky;top:65px;z-index:90;overflow-x:auto}
+.tabs{display:none;background:#fff;border-bottom:2px solid var(--n200);position:sticky;top:65px;z-index:90;overflow-x:auto}
+body[data-role="admin"] .tabs{display:flex}
 .tab{flex:1;padding:13px 8px;text-align:center;font-size:13px;font-weight:800;color:var(--n500);cursor:pointer;border:none;background:none;border-bottom:3px solid transparent;margin-bottom:-2px;white-space:nowrap;transition:.2s}
 .tab.active{color:var(--brand);border-bottom-color:var(--brand)}
 .tab .tb-count{background:var(--brand-l);color:var(--brand);border-radius:10px;padding:1px 7px;font-size:11px;margin-right:4px}
@@ -55,6 +58,13 @@ main{max-width:860px;margin:0 auto;padding:18px 14px 60px}
 .panel{display:none}
 .panel.active{display:block;animation:fadeIn .25s}
 @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* rep own counter */
+.my-stat{display:none;background:linear-gradient(135deg,var(--brand),var(--teal));border-radius:var(--radius-lg);padding:16px 20px;margin-bottom:16px;color:#fff;align-items:center;gap:14px;box-shadow:var(--shadow)}
+body[data-role="rep"] .my-stat{display:flex}
+.my-stat .ms-icon{font-size:30px}
+.my-stat .ms-num{font-size:26px;font-weight:900;line-height:1}
+.my-stat .ms-lbl{font-size:12px;opacity:.85;margin-top:3px}
 
 /* ══════ FORM ══════ */
 .card{background:#fff;border-radius:var(--radius-lg);box-shadow:var(--shadow);padding:22px 20px;margin-bottom:16px}
@@ -69,7 +79,6 @@ main{max-width:860px;margin:0 auto;padding:18px 14px 60px}
 .fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--brand);background:#fff;box-shadow:0 0 0 3px rgba(27,79,216,.1)}
 .fg .hint{font-size:11px;color:var(--n400)}
 
-/* class chips */
 .class-chips{display:flex;gap:8px}
 .class-chip{flex:1;padding:11px 4px;border:2px solid var(--n200);border-radius:var(--radius);background:var(--n50);text-align:center;font-weight:900;font-size:15px;cursor:pointer;transition:.15s;color:var(--n500)}
 .class-chip:hover{border-color:var(--n400)}
@@ -78,7 +87,6 @@ main{max-width:860px;margin:0 auto;padding:18px 14px 60px}
 .class-chip.sel-B{background:var(--amber);border-color:var(--amber);color:#fff}
 .class-chip.sel-C{background:var(--n500);border-color:var(--n500);color:#fff}
 
-/* dup box */
 .dupbox{border-radius:var(--radius);padding:14px 16px;margin-top:10px;font-size:13px;display:none;line-height:1.8}
 .dupbox.dup-exact{display:block;background:var(--red-l);border:2px solid #FCA5A5;color:#991B1B}
 .dupbox.dup-sim{display:block;background:var(--amber-l);border:2px solid #FCD34D;color:#92400E}
@@ -91,7 +99,6 @@ main{max-width:860px;margin:0 auto;padding:18px 14px 60px}
 .btn-submit:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 10px 26px rgba(27,79,216,.4)}
 .btn-submit:disabled{background:var(--n300);cursor:not-allowed;box-shadow:none}
 
-/* toast */
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--n900);color:#fff;padding:13px 22px;border-radius:14px;font-size:13.5px;font-weight:700;box-shadow:var(--shadow-lg);z-index:2000;transition:.3s;opacity:0;max-width:90vw;text-align:center}
 #toast.show{transform:translateX(-50%) translateY(0);opacity:1}
 #toast.ok{background:var(--green)}#toast.err{background:var(--red)}
@@ -108,7 +115,6 @@ main{max-width:860px;margin:0 auto;padding:18px 14px 60px}
 .doc-info{flex:1;min-width:0}
 .doc-name{font-weight:900;font-size:14.5px;color:var(--n900)}
 .doc-meta{font-size:12px;color:var(--n500);margin-top:3px;display:flex;flex-wrap:wrap;gap:4px 12px}
-.doc-meta span{display:inline-flex;align-items:center;gap:4px}
 .doc-side{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0}
 .cls-badge{font-size:12px;font-weight:900;padding:3px 12px;border-radius:10px}
 .cls-Aplus{background:var(--purple-l);color:var(--purple)}
@@ -137,24 +143,40 @@ main{max-width:860px;margin:0 auto;padding:18px 14px 60px}
 .rep-name{flex:1;font-weight:800;font-size:13.5px}
 .rep-cnt{font-weight:900;color:var(--brand);font-size:14px}
 
+/* ══════ USERS ADMIN ══════ */
+.usr-row{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--n100);flex-wrap:wrap}
+.usr-row:last-child{border:none}
+.usr-av{width:36px;height:36px;border-radius:10px;background:var(--brand-l);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.usr-info{flex:1;min-width:130px}
+.usr-name{font-weight:900;font-size:13.5px}
+.usr-uname{font-size:11px;color:var(--n400);direction:ltr;text-align:right}
+.usr-cnt{font-size:12px;font-weight:800;color:var(--brand);background:var(--brand-l);padding:3px 10px;border-radius:10px;white-space:nowrap}
+.usr-actions{display:flex;gap:6px}
+.btn-mini{border:none;border-radius:8px;padding:7px 10px;font-size:11.5px;font-weight:800;cursor:pointer}
+.btn-mini.edit{background:var(--n100);color:var(--n700)}
+.btn-mini.pass{background:var(--amber-l);color:var(--amber)}
+.btn-mini.off{background:var(--red-l);color:var(--red)}
+.btn-mini.on{background:var(--green-l);color:var(--green)}
+.usr-row.inactive{opacity:.45}
+
 @media(max-width:560px){
   .fgrid{grid-template-columns:1fr}
   .hd-user .hu-lbl{display:none}
 }
 </style>
 </head>
-<body>
+<body data-role="">
 
 <!-- LOGIN -->
 <div id="login-screen">
   <div class="login-card">
     <div class="lg-icon">🩺</div>
     <h1>سيرفي أطباء الموصل</h1>
-    <p>منصة جمع بيانات الأطباء الموحّدة للمندوبين<br>سجّل اسمك للبدء — سيظهر اسمك مع كل طبيب تضيفه</p>
-    <input id="li-name" placeholder="اسمك الكامل (مثال: أحمد محمود)" autocomplete="name">
-    <input id="li-company" placeholder="الشركة / الفريق (اختياري)">
-    <button onclick="doLogin()">دخول المنصة ←</button>
-    <div class="login-err" id="li-err">الرجاء كتابة اسمك (3 أحرف على الأقل)</div>
+    <p>منصة جمع بيانات الأطباء الموحّدة<br>أدخل اسم المستخدم وكلمة المرور المعطاة لك من المشرف</p>
+    <input id="li-user" placeholder="اسم المستخدم" autocomplete="username" autocapitalize="none">
+    <input id="li-pass" placeholder="كلمة المرور" type="password" autocomplete="current-password">
+    <button id="li-btn" onclick="doLogin()">دخول المنصة ←</button>
+    <div class="login-err" id="li-err"></div>
   </div>
 </div>
 
@@ -162,20 +184,25 @@ main{max-width:860px;margin:0 auto;padding:18px 14px 60px}
 <header>
   <div class="hd-logo">🩺</div>
   <div class="hd-title"><h1>سيرفي أطباء الموصل</h1><p>قاعدة بيانات موحّدة بلا تكرار</p></div>
-  <div class="hd-user">👤 <span id="hd-username" class="hu-lbl"></span></div>
+  <div class="hd-user" id="hd-user">👤 <span id="hd-username" class="hu-lbl"></span></div>
   <button class="hd-logout" onclick="logout()">خروج</button>
 </header>
 
-<!-- TABS -->
+<!-- TABS (admin only) -->
 <div class="tabs">
-  <button class="tab active" data-p="add" onclick="switchTab('add')">➕ تسجيل طبيب</button>
+  <button class="tab active" data-p="add" onclick="switchTab('add')">➕ تسجيل</button>
   <button class="tab" data-p="dir" onclick="switchTab('dir')">📖 الدليل <span class="tb-count" id="tb-count">0</span></button>
   <button class="tab" data-p="stats" onclick="switchTab('stats')">📊 الإحصائيات</button>
+  <button class="tab" data-p="users" onclick="switchTab('users')">👥 المندوبين</button>
 </div>
 
 <main>
 <!-- ═══ ADD PANEL ═══ -->
 <div class="panel active" id="p-add">
+  <div class="my-stat">
+    <div class="ms-icon">🏅</div>
+    <div><div class="ms-num" id="my-count">0</div><div class="ms-lbl">طبيباً سجّلتَ حتى الآن — استمر!</div></div>
+  </div>
   <div class="card">
     <h2>➕ تسجيل طبيب جديد</h2>
     <div class="sub">اكتب اسم الطبيب وسيتم فحص التكرار تلقائياً أثناء الكتابة</div>
@@ -240,7 +267,7 @@ main{max-width:860px;margin:0 auto;padding:18px 14px 60px}
   </div>
 </div>
 
-<!-- ═══ DIRECTORY PANEL ═══ -->
+<!-- ═══ DIRECTORY (admin) ═══ -->
 <div class="panel" id="p-dir">
   <div class="toolbar">
     <input id="q-search" placeholder="🔍 بحث بالاسم / الاختصاص / المنطقة..." oninput="renderDir()">
@@ -251,18 +278,28 @@ main{max-width:860px;margin:0 auto;padding:18px 14px 60px}
     </select>
     <select id="q-spec" onchange="renderDir()"><option value="">كل الاختصاصات</option></select>
     <select id="q-area" onchange="renderDir()"><option value="">كل المناطق</option></select>
+    <select id="q-rep" onchange="renderDir()"><option value="">كل المندوبين</option></select>
     <button class="btn-csv" onclick="exportCSV()">⬇ Excel</button>
   </div>
   <div class="doc-list" id="doc-list"></div>
 </div>
 
-<!-- ═══ STATS PANEL ═══ -->
+<!-- ═══ STATS (admin) ═══ -->
 <div class="panel" id="p-stats">
   <div class="stat-grid" id="stat-grid"></div>
   <div class="card"><h2>🏆 ترتيب المندوبين</h2><div class="sub">حسب عدد الأطباء المسجّلين</div><div id="rep-board"></div></div>
   <div class="card"><h2>🧬 توزيع الكلاسات</h2><div id="cls-bars" style="margin-top:14px"></div></div>
   <div class="card"><h2>📍 أعلى المناطق</h2><div id="area-bars" style="margin-top:14px"></div></div>
   <div class="card"><h2>🩺 أعلى الاختصاصات</h2><div id="spec-bars" style="margin-top:14px"></div></div>
+</div>
+
+<!-- ═══ USERS (admin) ═══ -->
+<div class="panel" id="p-users">
+  <div class="card">
+    <h2>👥 إدارة المندوبين</h2>
+    <div class="sub">غيّر الأسماء لأسماء مندوبيك الحقيقية، وأعد تعيين كلمة المرور عند الحاجة، وعطّل أي حساب فوراً</div>
+    <div id="usr-list"></div>
+  </div>
 </div>
 </main>
 
@@ -287,20 +324,45 @@ const $ = id => document.getElementById(id);
 
 /* ══════ SESSION ══════ */
 let ME = null;
-function loadSession(){
-  try{ ME = JSON.parse(localStorage.getItem('survey_rep')||'null'); }catch(e){ ME=null; }
-  if(ME && ME.name){ $('login-screen').style.display='none'; $('hd-username').textContent = ME.name; refresh(); }
+async function loadSession(){
+  let saved = null;
+  try{ saved = JSON.parse(localStorage.getItem('survey_session')||'null'); }catch(e){}
+  if(!saved || !saved.token){ return; }
+  try{
+    const me = await rpc('survey_me',{p_token:saved.token});
+    if(me.ok){ ME = {...me, token:saved.token}; enterApp(); }
+    else { localStorage.removeItem('survey_session'); }
+  }catch(e){ /* شبكة — أبقِ شاشة الدخول */ }
 }
-function doLogin(){
-  const name = $('li-name').value.trim();
-  if(name.length < 3){ $('li-err').style.display='block'; return; }
-  const company = $('li-company').value.trim();
-  ME = { name, company, username: name.replace(/\s+/g,'_') + (company?('@'+company):'') };
-  localStorage.setItem('survey_rep', JSON.stringify(ME));
-  loadSession();
+async function doLogin(){
+  const u=$('li-user').value.trim(), p=$('li-pass').value;
+  const err=$('li-err');
+  err.style.display='none';
+  if(!u || !p){ err.textContent='أدخل اسم المستخدم وكلمة المرور'; err.style.display='block'; return; }
+  $('li-btn').disabled=true; $('li-btn').textContent='جارٍ الدخول...';
+  try{
+    const res = await rpc('survey_login',{p_username:u, p_password:p});
+    if(res.ok){
+      ME = res;
+      localStorage.setItem('survey_session', JSON.stringify({token:res.token}));
+      enterApp();
+    } else {
+      err.textContent='⛔ اسم المستخدم أو كلمة المرور غير صحيحة';
+      err.style.display='block';
+    }
+  }catch(e){ err.textContent='خطأ في الاتصال بالإنترنت — حاول مجدداً'; err.style.display='block'; }
+  $('li-btn').disabled=false; $('li-btn').textContent='دخول المنصة ←';
 }
-function logout(){ localStorage.removeItem('survey_rep'); location.reload(); }
-$('li-name').addEventListener('keydown',e=>{ if(e.key==='Enter') doLogin(); });
+function enterApp(){
+  $('login-screen').style.display='none';
+  document.body.dataset.role = ME.role;
+  $('hd-username').textContent = ME.name + (ME.role==='admin'?' (المشرف)':'');
+  if(ME.role==='admin') $('hd-user').classList.add('admin');
+  $('my-count').textContent = ME.my_count||0;
+  if(ME.role==='admin') refresh();
+}
+function logout(){ localStorage.removeItem('survey_session'); location.reload(); }
+$('li-pass').addEventListener('keydown',e=>{ if(e.key==='Enter') doLogin(); });
 
 /* ══════ TABS ══════ */
 function switchTab(p){
@@ -308,6 +370,7 @@ function switchTab(p){
   document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));
   $('p-'+p).classList.add('active');
   if(p==='dir'||p==='stats') refresh();
+  if(p==='users') loadUsers();
 }
 
 /* ══════ CLASS CHIPS ══════ */
@@ -330,7 +393,8 @@ $('f-name').addEventListener('input', ()=>{
   if(v.length < 3){ box.className='dupbox'; return; }
   dupTimer = setTimeout(async ()=>{
     try{
-      const res = await rpc('survey_check_dup',{p_name:v});
+      const res = await rpc('survey_check_dup',{p_token:ME.token, p_name:v});
+      if(res.error==='auth'){ return sessionExpired(); }
       renderDup(res);
     }catch(e){ box.className='dupbox'; }
   }, 450);
@@ -343,8 +407,8 @@ function renderDup(res){
     const d = new Date(res.exact.created_at).toLocaleDateString('ar-IQ',{day:'numeric',month:'long'});
     box.className = 'dupbox dup-exact';
     box.innerHTML = `<div class="dup-title">⛔ هذا الطبيب مسجّل مسبقاً!</div>
-      سجّله المندوب <b>${esc(res.exact.rep_name)}</b> بتاريخ ${d}<br>
-      <b>${esc(res.exact.doctor_name)}</b> — ${esc(res.exact.specialty)} — ${esc(res.exact.area)} — كلاس ${esc(res.exact.class)}${res.exact.nearby_pharmacy?' — قرب '+esc(res.exact.nearby_pharmacy):''}
+      سجّله <b>${esc(res.exact.rep_name)}</b> بتاريخ ${d}<br>
+      <b>${esc(res.exact.doctor_name)}</b>${res.exact.specialty?' — '+esc(res.exact.specialty):''}${res.exact.area?' — '+esc(res.exact.area):''}${res.exact.class?' — كلاس '+esc(res.exact.class):''}${res.exact.nearby_pharmacy?' — قرب '+esc(res.exact.nearby_pharmacy):''}
       <br>لا حاجة لإعادة تسجيله ✋`;
   } else if(res.similar && res.similar.length){
     isDup = false;
@@ -366,6 +430,10 @@ function updateSubmit(){
   b.disabled = isDup;
   b.textContent = isDup ? '⛔ الطبيب مسجّل مسبقاً — لا يمكن التكرار' : '✔ تسجيل الطبيب في السيرفي';
 }
+function sessionExpired(){
+  toast('انتهت صلاحية الجلسة — سجّل دخولك مجدداً','err');
+  setTimeout(logout, 1500);
+}
 
 /* ══════ SUBMIT ══════ */
 async function submitDoctor(){
@@ -377,30 +445,35 @@ async function submitDoctor(){
   $('btn-submit').disabled = true;
   try{
     const res = await rpc('survey_add_doctor',{
-      p_name:name, p_specialty:spec, p_area:area, p_class:selClass,
-      p_pharmacy:$('f-pharm').value, p_phone:$('f-phone').value, p_notes:$('f-notes').value,
-      p_rep_username:ME.username, p_rep_name:ME.name + (ME.company?' ('+ME.company+')':'')
+      p_token:ME.token, p_name:name, p_specialty:spec, p_area:area, p_class:selClass,
+      p_pharmacy:$('f-pharm').value, p_phone:$('f-phone').value, p_notes:$('f-notes').value
     });
     if(res.ok){
       toast('✅ تم تسجيل الطبيب بنجاح','ok');
+      ME.my_count = res.my_count ?? (ME.my_count+1);
+      $('my-count').textContent = ME.my_count;
       ['f-name','f-spec','f-area','f-pharm','f-phone','f-notes'].forEach(i=>$(i).value='');
       selClass=null; document.querySelectorAll('.class-chip').forEach(x=>x.className='class-chip');
       $('dupbox').className='dupbox'; isDup=false;
-      refresh();
+      if(ME.role==='admin') refresh();
     } else if(res.reason==='duplicate'){
       isDup=true;
-      toast('⛔ سبقك المندوب '+(res.existing_rep||'آخر')+' بتسجيل هذا الطبيب','err');
-      renderDup({exact:{doctor_name:res.existing_name||name, rep_name:res.existing_rep||'مندوب آخر', created_at:res.existing_at||new Date().toISOString(), specialty:'', area:'', class:''}});
-    } else toast('الاسم قصير جداً','err');
+      toast('⛔ سبقك '+(res.existing_rep||'مندوب آخر')+' بتسجيل هذا الطبيب','err');
+      renderDup({exact:{doctor_name:res.existing_name||name, rep_name:res.existing_rep||'مندوب آخر', created_at:res.existing_at||new Date().toISOString()}});
+    } else if(res.reason==='auth'){ return sessionExpired();
+    } else toast('تحقق من البيانات المدخلة','err');
   }catch(e){ toast('خطأ في الاتصال — حاول مجدداً','err'); }
   updateSubmit();
 }
 
-/* ══════ DATA + DIRECTORY ══════ */
+/* ══════ ADMIN: DATA + DIRECTORY ══════ */
 let ALL = [];
 async function refresh(){
+  if(!ME || ME.role!=='admin') return;
   try{
-    ALL = await rpc('survey_list',{}) || [];
+    const res = await rpc('survey_list',{p_token:ME.token});
+    if(res.error==='auth') return sessionExpired();
+    ALL = res.rows || [];
     $('tb-count').textContent = ALL.length;
     fillFilters(); renderDir(); renderStats();
   }catch(e){}
@@ -413,15 +486,16 @@ function fillFilters(){
   };
   mk('q-spec', ALL.map(d=>d.specialty));
   mk('q-area', ALL.map(d=>d.area));
+  mk('q-rep',  ALL.map(d=>d.rep_name));
 }
 const norm = s => (s||'').replace(/[أإآ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي').replace(/^د\.\s*/,'').toLowerCase();
 function renderDir(){
-  const q=norm($('q-search').value.trim()), fc=$('q-class').value, fs=$('q-spec').value, fa=$('q-area').value;
+  const q=norm($('q-search').value.trim()), fc=$('q-class').value, fs=$('q-spec').value, fa=$('q-area').value, fr=$('q-rep').value;
   const rows = ALL.filter(d=>
     (!q || norm(d.doctor_name).includes(q) || norm(d.specialty).includes(q) || norm(d.area).includes(q) || norm(d.nearby_pharmacy).includes(q))
-    && (!fc||d.class===fc) && (!fs||d.specialty===fs) && (!fa||d.area===fa));
+    && (!fc||d.class===fc) && (!fs||d.specialty===fs) && (!fa||d.area===fa) && (!fr||d.rep_name===fr));
   const el = $('doc-list');
-  if(!rows.length){ el.innerHTML = `<div class="empty"><div class="em-icon">🔍</div>لا يوجد أطباء ${ALL.length?'مطابقون للبحث':'مسجّلون بعد — كن أول من يسجّل!'}</div>`; return; }
+  if(!rows.length){ el.innerHTML = `<div class="empty"><div class="em-icon">🔍</div>لا يوجد أطباء ${ALL.length?'مطابقون للبحث':'مسجّلون بعد'}</div>`; return; }
   el.innerHTML = rows.map(d=>`
     <div class="doc-card">
       <div class="doc-av">🩺</div>
@@ -438,19 +512,19 @@ function renderDir(){
       <div class="doc-side">
         <span class="cls-badge cls-${d.class.replace('+','plus')}">${d.class}</span>
         <span class="doc-rep">👤 ${esc(d.rep_name)}</span>
-        ${d.rep_name && ME && d.rep_name.startsWith(ME.name)?`<button class="btn-del" title="حذف" onclick="delDoc('${d.id}')">🗑</button>`:''}
+        <button class="btn-del" title="حذف" onclick="delDoc('${d.id}')">🗑</button>
       </div>
     </div>`).join('');
 }
 async function delDoc(id){
   if(!confirm('حذف هذا الطبيب من السيرفي؟')) return;
   try{
-    const r = await rpc('survey_delete',{p_id:id,p_rep_username:ME.username});
-    if(r.ok){ toast('تم الحذف','ok'); refresh(); } else toast('يمكنك حذف سجلاتك فقط','err');
+    const r = await rpc('survey_delete',{p_token:ME.token, p_id:id});
+    if(r.ok){ toast('تم الحذف','ok'); refresh(); } else toast('غير مسموح','err');
   }catch(e){ toast('خطأ في الاتصال','err'); }
 }
 
-/* ══════ STATS ══════ */
+/* ══════ ADMIN: STATS ══════ */
 const COLORS=['#1B4FD8','#0891B2','#059669','#D97706','#7C3AED','#DC2626','#DB2777','#65A30D'];
 function count(arr,key){ const m={}; arr.forEach(d=>{const k=d[key]||'—'; m[k]=(m[k]||0)+1;}); return Object.entries(m).sort((a,b)=>b[1]-a[1]); }
 function bars(elId, entries, max){
@@ -471,6 +545,46 @@ function renderStats(){
     <div class="rep-row"><div class="rep-rank ${i===0?'r1':''}">${i===0?'🥇':i+1}</div>
     <div class="rep-name">${esc(k)}</div><div class="rep-cnt">${v} طبيب</div></div>`).join('')
     : '<div class="empty" style="padding:20px">لا بيانات بعد</div>';
+}
+
+/* ══════ ADMIN: USERS ══════ */
+async function loadUsers(){
+  try{
+    const res = await rpc('survey_admin_users',{p_token:ME.token});
+    if(res.error==='auth') return sessionExpired();
+    const users = (res.users||[]).filter(u=>u.role!=='admin');
+    $('usr-list').innerHTML = users.map(u=>`
+      <div class="usr-row ${u.active?'':'inactive'}">
+        <div class="usr-av">👤</div>
+        <div class="usr-info">
+          <div class="usr-name">${esc(u.full_name)}</div>
+          <div class="usr-uname">${esc(u.username)}</div>
+        </div>
+        <span class="usr-cnt">${u.cnt} طبيب</span>
+        <div class="usr-actions">
+          <button class="btn-mini edit" onclick="renameUser('${u.id}','${esc(u.full_name)}')">✏️ الاسم</button>
+          <button class="btn-mini pass" onclick="resetPass('${u.id}','${esc(u.full_name)}')">🔑 كلمة السر</button>
+          <button class="btn-mini ${u.active?'off':'on'}" onclick="toggleUser('${u.id}',${u.active})">${u.active?'⛔ تعطيل':'✅ تفعيل'}</button>
+        </div>
+      </div>`).join('');
+  }catch(e){ toast('خطأ في التحميل','err'); }
+}
+async function renameUser(id, cur){
+  const name = prompt('الاسم الحقيقي للمندوب (يظهر مع كل تسجيلاته):', cur);
+  if(!name || !name.trim()) return;
+  await rpc('survey_admin_set_user',{p_token:ME.token, p_user_id:id, p_name:name.trim()});
+  toast('تم تغيير الاسم','ok'); loadUsers();
+}
+async function resetPass(id, name){
+  if(!confirm('إعادة تعيين كلمة مرور "'+name+'"؟ سيتم تسجيل خروجه من كل الأجهزة.')) return;
+  const np = String(Math.floor(100000 + Math.random()*900000));
+  await rpc('survey_admin_set_user',{p_token:ME.token, p_user_id:id, p_new_password:np});
+  prompt('كلمة المرور الجديدة لـ "'+name+'" — انسخها وأرسلها له:', np);
+  loadUsers();
+}
+async function toggleUser(id, active){
+  await rpc('survey_admin_set_user',{p_token:ME.token, p_user_id:id, p_active:!active});
+  toast(active?'تم تعطيل الحساب':'تم تفعيل الحساب','ok'); loadUsers();
 }
 
 /* ══════ CSV EXPORT ══════ */
