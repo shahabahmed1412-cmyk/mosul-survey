@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>سيرفي أطباء الموصل</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brand:#1B4FD8;--brand-d:#1338A8;--brand-l:#EEF2FF;
+  --teal:#0891B2;--green:#059669;--green-l:#D1FAE5;
+  --amber:#D97706;--amber-l:#FEF3C7;--red:#DC2626;--red-l:#FEE2E2;
+  --purple:#7C3AED;--purple-l:#EDE9FE;
+  --n50:#F8FAFC;--n100:#F1F5F9;--n200:#E2E8F0;--n300:#CBD5E1;--n400:#94A3B8;
+  --n500:#64748B;--n600:#475569;--n700:#334155;--n800:#1E293B;--n900:#0F172A;
+  --radius:12px;--radius-lg:16px;
+  --shadow:0 4px 16px rgba(0,0,0,.08),0 2px 6px rgba(0,0,0,.04);
+  --shadow-lg:0 12px 40px rgba(0,0,0,.12);
+  --font:'Cairo',system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--n50);color:var(--n800);min-height:100vh}
+input,select,textarea,button{font-family:var(--font);font-size:14px}
+::placeholder{color:var(--n400)}
+
+/* ══════ LOGIN ══════ */
+#login-screen{position:fixed;inset:0;background:linear-gradient(135deg,#0F172A 0%,#1B4FD8 60%,#0891B2 100%);display:flex;align-items:center;justify-content:center;padding:20px;z-index:1000}
+.login-card{background:rgba(255,255,255,.08);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.15);border-radius:24px;padding:40px 32px;max-width:420px;width:100%;text-align:center}
+.login-card .lg-icon{font-size:52px;margin-bottom:14px}
+.login-card h1{color:#fff;font-size:24px;font-weight:900;margin-bottom:6px}
+.login-card p{color:rgba(255,255,255,.65);font-size:13px;line-height:1.8;margin-bottom:28px}
+.login-card input{width:100%;padding:13px 16px;border-radius:var(--radius);border:2px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:#fff;margin-bottom:12px;outline:none;transition:.2s}
+.login-card input:focus{border-color:#fff;background:rgba(255,255,255,.15)}
+.login-card input::placeholder{color:rgba(255,255,255,.45)}
+.login-card button{width:100%;padding:14px;background:#fff;color:var(--brand);border:none;border-radius:var(--radius);font-weight:800;font-size:15px;cursor:pointer;transition:.2s}
+.login-card button:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(255,255,255,.25)}
+.login-err{color:#FCA5A5;font-size:12px;margin-top:10px;display:none}
+
+/* ══════ HEADER ══════ */
+header{background:#fff;border-bottom:1px solid var(--n200);padding:12px 16px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.hd-logo{width:40px;height:40px;background:linear-gradient(135deg,var(--brand),var(--teal));border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.hd-title{flex:1;min-width:0}
+.hd-title h1{font-size:16px;font-weight:900;color:var(--n900);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hd-title p{font-size:11px;color:var(--n500)}
+.hd-user{display:flex;align-items:center;gap:8px;background:var(--brand-l);padding:6px 12px;border-radius:20px;font-size:12px;font-weight:700;color:var(--brand);white-space:nowrap}
+.hd-logout{background:var(--red-l);color:var(--red);border:none;border-radius:9px;padding:8px 10px;cursor:pointer;font-weight:700;font-size:12px}
+
+/* ══════ TABS ══════ */
+.tabs{display:flex;background:#fff;border-bottom:2px solid var(--n200);position:sticky;top:65px;z-index:90;overflow-x:auto}
+.tab{flex:1;padding:13px 8px;text-align:center;font-size:13px;font-weight:800;color:var(--n500);cursor:pointer;border:none;background:none;border-bottom:3px solid transparent;margin-bottom:-2px;white-space:nowrap;transition:.2s}
+.tab.active{color:var(--brand);border-bottom-color:var(--brand)}
+.tab .tb-count{background:var(--brand-l);color:var(--brand);border-radius:10px;padding:1px 7px;font-size:11px;margin-right:4px}
+
+main{max-width:860px;margin:0 auto;padding:18px 14px 60px}
+.panel{display:none}
+.panel.active{display:block;animation:fadeIn .25s}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* ══════ FORM ══════ */
+.card{background:#fff;border-radius:var(--radius-lg);box-shadow:var(--shadow);padding:22px 20px;margin-bottom:16px}
+.card h2{font-size:16px;font-weight:900;color:var(--n900);margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.card .sub{font-size:12px;color:var(--n500);margin-bottom:18px}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.fg{display:flex;flex-direction:column;gap:6px}
+.fg.full{grid-column:1/-1}
+.fg label{font-size:12.5px;font-weight:800;color:var(--n700)}
+.fg label .req{color:var(--red)}
+.fg input,.fg select,.fg textarea{padding:11px 14px;border:2px solid var(--n200);border-radius:var(--radius);outline:none;background:var(--n50);transition:.2s;width:100%}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--brand);background:#fff;box-shadow:0 0 0 3px rgba(27,79,216,.1)}
+.fg .hint{font-size:11px;color:var(--n400)}
+
+/* class chips */
+.class-chips{display:flex;gap:8px}
+.class-chip{flex:1;padding:11px 4px;border:2px solid var(--n200);border-radius:var(--radius);background:var(--n50);text-align:center;font-weight:900;font-size:15px;cursor:pointer;transition:.15s;color:var(--n500)}
+.class-chip:hover{border-color:var(--n400)}
+.class-chip.sel-Aplus{background:var(--purple);border-color:var(--purple);color:#fff}
+.class-chip.sel-A{background:var(--green);border-color:var(--green);color:#fff}
+.class-chip.sel-B{background:var(--amber);border-color:var(--amber);color:#fff}
+.class-chip.sel-C{background:var(--n500);border-color:var(--n500);color:#fff}
+
+/* dup box */
+.dupbox{border-radius:var(--radius);padding:14px 16px;margin-top:10px;font-size:13px;display:none;line-height:1.8}
+.dupbox.dup-exact{display:block;background:var(--red-l);border:2px solid #FCA5A5;color:#991B1B}
+.dupbox.dup-sim{display:block;background:var(--amber-l);border:2px solid #FCD34D;color:#92400E}
+.dupbox.dup-ok{display:block;background:var(--green-l);border:2px solid #6EE7B7;color:#065F46}
+.dupbox .dup-title{font-weight:900;display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.dupbox ul{margin:6px 18px 0 0}
+.dupbox .src-tag{font-size:10px;padding:1px 7px;border-radius:8px;background:rgba(0,0,0,.08);font-weight:700;margin-right:4px}
+
+.btn-submit{width:100%;padding:15px;background:linear-gradient(135deg,var(--brand),var(--brand-d));color:#fff;border:none;border-radius:var(--radius);font-size:15px;font-weight:900;cursor:pointer;margin-top:18px;transition:.2s;box-shadow:0 6px 18px rgba(27,79,216,.3)}
+.btn-submit:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 10px 26px rgba(27,79,216,.4)}
+.btn-submit:disabled{background:var(--n300);cursor:not-allowed;box-shadow:none}
+
+/* toast */
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--n900);color:#fff;padding:13px 22px;border-radius:14px;font-size:13.5px;font-weight:700;box-shadow:var(--shadow-lg);z-index:2000;transition:.3s;opacity:0;max-width:90vw;text-align:center}
+#toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+#toast.ok{background:var(--green)}#toast.err{background:var(--red)}
+
+/* ══════ DIRECTORY ══════ */
+.toolbar{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.toolbar input,.toolbar select{padding:10px 14px;border:2px solid var(--n200);border-radius:var(--radius);outline:none;background:#fff}
+.toolbar input{flex:1;min-width:160px}
+.toolbar select{min-width:110px}
+.btn-csv{padding:10px 16px;background:var(--green);color:#fff;border:none;border-radius:var(--radius);font-weight:800;cursor:pointer;font-size:13px}
+.doc-list{display:flex;flex-direction:column;gap:10px}
+.doc-card{background:#fff;border-radius:var(--radius-lg);box-shadow:var(--shadow);padding:15px 17px;display:flex;gap:13px;align-items:flex-start}
+.doc-av{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;background:var(--brand-l)}
+.doc-info{flex:1;min-width:0}
+.doc-name{font-weight:900;font-size:14.5px;color:var(--n900)}
+.doc-meta{font-size:12px;color:var(--n500);margin-top:3px;display:flex;flex-wrap:wrap;gap:4px 12px}
+.doc-meta span{display:inline-flex;align-items:center;gap:4px}
+.doc-side{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0}
+.cls-badge{font-size:12px;font-weight:900;padding:3px 12px;border-radius:10px}
+.cls-Aplus{background:var(--purple-l);color:var(--purple)}
+.cls-A{background:var(--green-l);color:var(--green)}
+.cls-B{background:var(--amber-l);color:var(--amber)}
+.cls-C{background:var(--n100);color:var(--n600)}
+.doc-rep{font-size:10.5px;color:var(--n400)}
+.btn-del{background:none;border:none;color:var(--n300);cursor:pointer;font-size:15px;padding:2px}
+.btn-del:hover{color:var(--red)}
+.empty{text-align:center;padding:50px 20px;color:var(--n400);font-size:14px}
+.empty .em-icon{font-size:44px;margin-bottom:10px}
+
+/* ══════ STATS ══════ */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}
+.stat-card{background:#fff;border-radius:var(--radius-lg);box-shadow:var(--shadow);padding:18px;text-align:center}
+.stat-card .sc-num{font-size:28px;font-weight:900;color:var(--brand)}
+.stat-card .sc-lbl{font-size:12px;color:var(--n500);font-weight:700;margin-top:2px}
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-size:12.5px}
+.bar-row .br-lbl{width:110px;font-weight:800;color:var(--n700);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:0}
+.bar-row .br-track{flex:1;height:22px;background:var(--n100);border-radius:8px;overflow:hidden}
+.bar-row .br-fill{height:100%;border-radius:8px;display:flex;align-items:center;justify-content:flex-end;padding-left:8px;color:#fff;font-weight:800;font-size:11px;min-width:26px;transition:width .5s}
+.rep-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--n100)}
+.rep-row:last-child{border:none}
+.rep-rank{width:28px;height:28px;border-radius:50%;background:var(--brand-l);color:var(--brand);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;flex-shrink:0}
+.rep-rank.r1{background:#FEF3C7;color:#B45309}
+.rep-name{flex:1;font-weight:800;font-size:13.5px}
+.rep-cnt{font-weight:900;color:var(--brand);font-size:14px}
+
+@media(max-width:560px){
+  .fgrid{grid-template-columns:1fr}
+  .hd-user .hu-lbl{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="lg-icon">🩺</div>
+    <h1>سيرفي أطباء الموصل</h1>
+    <p>منصة جمع بيانات الأطباء الموحّدة للمندوبين<br>سجّل اسمك للبدء — سيظهر اسمك مع كل طبيب تضيفه</p>
+    <input id="li-name" placeholder="اسمك الكامل (مثال: أحمد محمود)" autocomplete="name">
+    <input id="li-company" placeholder="الشركة / الفريق (اختياري)">
+    <button onclick="doLogin()">دخول المنصة ←</button>
+    <div class="login-err" id="li-err">الرجاء كتابة اسمك (3 أحرف على الأقل)</div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="hd-logo">🩺</div>
+  <div class="hd-title"><h1>سيرفي أطباء الموصل</h1><p>قاعدة بيانات موحّدة بلا تكرار</p></div>
+  <div class="hd-user">👤 <span id="hd-username" class="hu-lbl"></span></div>
+  <button class="hd-logout" onclick="logout()">خروج</button>
+</header>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab active" data-p="add" onclick="switchTab('add')">➕ تسجيل طبيب</button>
+  <button class="tab" data-p="dir" onclick="switchTab('dir')">📖 الدليل <span class="tb-count" id="tb-count">0</span></button>
+  <button class="tab" data-p="stats" onclick="switchTab('stats')">📊 الإحصائيات</button>
+</div>
+
+<main>
+<!-- ═══ ADD PANEL ═══ -->
+<div class="panel active" id="p-add">
+  <div class="card">
+    <h2>➕ تسجيل طبيب جديد</h2>
+    <div class="sub">اكتب اسم الطبيب وسيتم فحص التكرار تلقائياً أثناء الكتابة</div>
+    <div class="fgrid">
+      <div class="fg full">
+        <label>اسم الطبيب <span class="req">*</span></label>
+        <input id="f-name" placeholder="مثال: د. أحمد محمد العبيدي" autocomplete="off">
+        <div class="hint">لا يهم كتابة "د." أو الهمزات — النظام يوحّد الأسماء تلقائياً</div>
+        <div class="dupbox" id="dupbox"></div>
+      </div>
+      <div class="fg">
+        <label>الاختصاص <span class="req">*</span></label>
+        <input id="f-spec" list="dl-spec" placeholder="اختر أو اكتب...">
+        <datalist id="dl-spec">
+          <option>باطنية</option><option>أطفال</option><option>نسائية وتوليد</option>
+          <option>جلدية</option><option>جراحة عامة</option><option>كسور ومفاصل</option>
+          <option>قلبية</option><option>عيون</option><option>أنف وأذن وحنجرة</option>
+          <option>مسالك بولية</option><option>جملة عصبية</option><option>نفسية</option>
+          <option>غدد صم وسكري</option><option>صدرية وتنفسية</option><option>جهاز هضمي</option>
+          <option>كلى</option><option>أورام</option><option>روماتزم</option>
+          <option>طب عام</option><option>عناية مركزة</option>
+        </datalist>
+      </div>
+      <div class="fg">
+        <label>المنطقة <span class="req">*</span></label>
+        <input id="f-area" list="dl-area" placeholder="اختر أو اكتب...">
+        <datalist id="dl-area">
+          <option>الدواسة</option><option>باب الطوب</option><option>الزهور</option>
+          <option>المجموعة الثقافية</option><option>الحدباء</option><option>القادسية</option>
+          <option>المثنى</option><option>النور</option><option>السكر</option>
+          <option>المهندسين</option><option>الرفاعي</option><option>الكرامة</option>
+          <option>فلسطين</option><option>الوحدة</option><option>السماح</option>
+          <option>التأميم</option><option>الرشيدية</option><option>النبي يونس</option>
+          <option>الزنجيلي</option><option>17 تموز</option><option>الجزائر</option>
+          <option>المنصور</option><option>وادي حجر</option><option>باب سنجار</option>
+          <option>الفيصلية</option><option>الساحل الأيسر</option><option>الساحل الأيمن</option>
+        </datalist>
+      </div>
+      <div class="fg">
+        <label>كلاس الطبيب <span class="req">*</span></label>
+        <div class="class-chips" id="class-chips">
+          <button type="button" class="class-chip" data-c="A+">A+</button>
+          <button type="button" class="class-chip" data-c="A">A</button>
+          <button type="button" class="class-chip" data-c="B">B</button>
+          <button type="button" class="class-chip" data-c="C">C</button>
+        </div>
+      </div>
+      <div class="fg">
+        <label>الصيدلية القريبة</label>
+        <input id="f-pharm" placeholder="مثال: صيدلية النور">
+      </div>
+      <div class="fg">
+        <label>رقم الهاتف (اختياري)</label>
+        <input id="f-phone" placeholder="07xxxxxxxxx" inputmode="tel">
+      </div>
+      <div class="fg">
+        <label>ملاحظات (اختياري)</label>
+        <input id="f-notes" placeholder="أيام التواجد، العيادة...">
+      </div>
+    </div>
+    <button class="btn-submit" id="btn-submit" onclick="submitDoctor()">✔ تسجيل الطبيب في السيرفي</button>
+  </div>
+</div>
+
+<!-- ═══ DIRECTORY PANEL ═══ -->
+<div class="panel" id="p-dir">
+  <div class="toolbar">
+    <input id="q-search" placeholder="🔍 بحث بالاسم / الاختصاص / المنطقة..." oninput="renderDir()">
+    <select id="q-class" onchange="renderDir()">
+      <option value="">كل الكلاسات</option>
+      <option value="A+">A+</option><option value="A">A</option>
+      <option value="B">B</option><option value="C">C</option>
+    </select>
+    <select id="q-spec" onchange="renderDir()"><option value="">كل الاختصاصات</option></select>
+    <select id="q-area" onchange="renderDir()"><option value="">كل المناطق</option></select>
+    <button class="btn-csv" onclick="exportCSV()">⬇ Excel</button>
+  </div>
+  <div class="doc-list" id="doc-list"></div>
+</div>
+
+<!-- ═══ STATS PANEL ═══ -->
+<div class="panel" id="p-stats">
+  <div class="stat-grid" id="stat-grid"></div>
+  <div class="card"><h2>🏆 ترتيب المندوبين</h2><div class="sub">حسب عدد الأطباء المسجّلين</div><div id="rep-board"></div></div>
+  <div class="card"><h2>🧬 توزيع الكلاسات</h2><div id="cls-bars" style="margin-top:14px"></div></div>
+  <div class="card"><h2>📍 أعلى المناطق</h2><div id="area-bars" style="margin-top:14px"></div></div>
+  <div class="card"><h2>🩺 أعلى الاختصاصات</h2><div id="spec-bars" style="margin-top:14px"></div></div>
+</div>
+</main>
+
+<div id="toast"></div>
+
+<script>
+const SB_URL = 'https://hjwxwxvqclyrkuvyzrcc.supabase.co';
+const SB_KEY = 'sb_publishable_VeFIASzc6TGceT3VOnHqLg_t2qLiBsn';
+
+async function rpc(fn, args){
+  const r = await fetch(`${SB_URL}/rest/v1/rpc/${fn}`,{
+    method:'POST',
+    headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json'},
+    body:JSON.stringify(args||{})
+  });
+  if(!r.ok) throw new Error('network');
+  return r.json();
+}
+
+const esc = s => String(s??'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const $ = id => document.getElementById(id);
+
+/* ══════ SESSION ══════ */
+let ME = null;
+function loadSession(){
+  try{ ME = JSON.parse(localStorage.getItem('survey_rep')||'null'); }catch(e){ ME=null; }
+  if(ME && ME.name){ $('login-screen').style.display='none'; $('hd-username').textContent = ME.name; refresh(); }
+}
+function doLogin(){
+  const name = $('li-name').value.trim();
+  if(name.length < 3){ $('li-err').style.display='block'; return; }
+  const company = $('li-company').value.trim();
+  ME = { name, company, username: name.replace(/\s+/g,'_') + (company?('@'+company):'') };
+  localStorage.setItem('survey_rep', JSON.stringify(ME));
+  loadSession();
+}
+function logout(){ localStorage.removeItem('survey_rep'); location.reload(); }
+$('li-name').addEventListener('keydown',e=>{ if(e.key==='Enter') doLogin(); });
+
+/* ══════ TABS ══════ */
+function switchTab(p){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.p===p));
+  document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));
+  $('p-'+p).classList.add('active');
+  if(p==='dir'||p==='stats') refresh();
+}
+
+/* ══════ CLASS CHIPS ══════ */
+let selClass = null;
+document.querySelectorAll('.class-chip').forEach(ch=>{
+  ch.onclick = ()=>{
+    selClass = ch.dataset.c;
+    document.querySelectorAll('.class-chip').forEach(x=>x.className='class-chip');
+    ch.classList.add('sel-'+selClass.replace('+','plus'));
+  };
+});
+
+/* ══════ LIVE DUP CHECK ══════ */
+let dupTimer=null, isDup=false;
+$('f-name').addEventListener('input', ()=>{
+  clearTimeout(dupTimer);
+  const v = $('f-name').value.trim();
+  const box = $('dupbox');
+  isDup = false; updateSubmit();
+  if(v.length < 3){ box.className='dupbox'; return; }
+  dupTimer = setTimeout(async ()=>{
+    try{
+      const res = await rpc('survey_check_dup',{p_name:v});
+      renderDup(res);
+    }catch(e){ box.className='dupbox'; }
+  }, 450);
+});
+
+function renderDup(res){
+  const box = $('dupbox');
+  if(res.exact){
+    isDup = true;
+    const d = new Date(res.exact.created_at).toLocaleDateString('ar-IQ',{day:'numeric',month:'long'});
+    box.className = 'dupbox dup-exact';
+    box.innerHTML = `<div class="dup-title">⛔ هذا الطبيب مسجّل مسبقاً!</div>
+      سجّله المندوب <b>${esc(res.exact.rep_name)}</b> بتاريخ ${d}<br>
+      <b>${esc(res.exact.doctor_name)}</b> — ${esc(res.exact.specialty)} — ${esc(res.exact.area)} — كلاس ${esc(res.exact.class)}${res.exact.nearby_pharmacy?' — قرب '+esc(res.exact.nearby_pharmacy):''}
+      <br>لا حاجة لإعادة تسجيله ✋`;
+  } else if(res.similar && res.similar.length){
+    isDup = false;
+    box.className = 'dupbox dup-sim';
+    box.innerHTML = `<div class="dup-title">⚠️ يوجد أسماء مشابهة — تأكد أنه ليس نفس الطبيب:</div>
+      <ul>` + res.similar.map(s=>
+        `<li><b>${esc(s.doctor_name)}</b> (${esc(s.specialty||'—')} / ${esc(s.area||'—')}) — سجّله ${esc(s.rep_name)}
+         <span class="src-tag">${s.source==='survey'?'السيرفي':'نظام الشركة'}</span></li>`
+      ).join('') + `</ul>إذا كان طبيباً مختلفاً يمكنك المتابعة بشكل طبيعي ✓`;
+  } else {
+    isDup = false;
+    box.className = 'dupbox dup-ok';
+    box.innerHTML = `<div class="dup-title">✅ الاسم غير مسجّل — يمكنك المتابعة</div>`;
+  }
+  updateSubmit();
+}
+function updateSubmit(){
+  const b = $('btn-submit');
+  b.disabled = isDup;
+  b.textContent = isDup ? '⛔ الطبيب مسجّل مسبقاً — لا يمكن التكرار' : '✔ تسجيل الطبيب في السيرفي';
+}
+
+/* ══════ SUBMIT ══════ */
+async function submitDoctor(){
+  const name=$('f-name').value.trim(), spec=$('f-spec').value.trim(), area=$('f-area').value.trim();
+  if(name.length<3) return toast('اكتب اسم الطبيب','err');
+  if(!spec) return toast('اختر الاختصاص','err');
+  if(!area) return toast('اختر المنطقة','err');
+  if(!selClass) return toast('اختر كلاس الطبيب','err');
+  $('btn-submit').disabled = true;
+  try{
+    const res = await rpc('survey_add_doctor',{
+      p_name:name, p_specialty:spec, p_area:area, p_class:selClass,
+      p_pharmacy:$('f-pharm').value, p_phone:$('f-phone').value, p_notes:$('f-notes').value,
+      p_rep_username:ME.username, p_rep_name:ME.name + (ME.company?' ('+ME.company+')':'')
+    });
+    if(res.ok){
+      toast('✅ تم تسجيل الطبيب بنجاح','ok');
+      ['f-name','f-spec','f-area','f-pharm','f-phone','f-notes'].forEach(i=>$(i).value='');
+      selClass=null; document.querySelectorAll('.class-chip').forEach(x=>x.className='class-chip');
+      $('dupbox').className='dupbox'; isDup=false;
+      refresh();
+    } else if(res.reason==='duplicate'){
+      isDup=true;
+      toast('⛔ سبقك المندوب '+(res.existing_rep||'آخر')+' بتسجيل هذا الطبيب','err');
+      renderDup({exact:{doctor_name:res.existing_name||name, rep_name:res.existing_rep||'مندوب آخر', created_at:res.existing_at||new Date().toISOString(), specialty:'', area:'', class:''}});
+    } else toast('الاسم قصير جداً','err');
+  }catch(e){ toast('خطأ في الاتصال — حاول مجدداً','err'); }
+  updateSubmit();
+}
+
+/* ══════ DATA + DIRECTORY ══════ */
+let ALL = [];
+async function refresh(){
+  try{
+    ALL = await rpc('survey_list',{}) || [];
+    $('tb-count').textContent = ALL.length;
+    fillFilters(); renderDir(); renderStats();
+  }catch(e){}
+}
+function fillFilters(){
+  const mk=(id,vals)=>{
+    const sel=$(id), cur=sel.value;
+    sel.innerHTML = sel.options[0].outerHTML + [...new Set(vals)].sort().map(v=>`<option>${esc(v)}</option>`).join('');
+    sel.value=cur;
+  };
+  mk('q-spec', ALL.map(d=>d.specialty));
+  mk('q-area', ALL.map(d=>d.area));
+}
+const norm = s => (s||'').replace(/[أإآ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي').replace(/^د\.\s*/,'').toLowerCase();
+function renderDir(){
+  const q=norm($('q-search').value.trim()), fc=$('q-class').value, fs=$('q-spec').value, fa=$('q-area').value;
+  const rows = ALL.filter(d=>
+    (!q || norm(d.doctor_name).includes(q) || norm(d.specialty).includes(q) || norm(d.area).includes(q) || norm(d.nearby_pharmacy).includes(q))
+    && (!fc||d.class===fc) && (!fs||d.specialty===fs) && (!fa||d.area===fa));
+  const el = $('doc-list');
+  if(!rows.length){ el.innerHTML = `<div class="empty"><div class="em-icon">🔍</div>لا يوجد أطباء ${ALL.length?'مطابقون للبحث':'مسجّلون بعد — كن أول من يسجّل!'}</div>`; return; }
+  el.innerHTML = rows.map(d=>`
+    <div class="doc-card">
+      <div class="doc-av">🩺</div>
+      <div class="doc-info">
+        <div class="doc-name">${esc(d.doctor_name)}</div>
+        <div class="doc-meta">
+          <span>🔬 ${esc(d.specialty)}</span>
+          <span>📍 ${esc(d.area)}</span>
+          ${d.nearby_pharmacy?`<span>💊 ${esc(d.nearby_pharmacy)}</span>`:''}
+          ${d.phone?`<span>📱 ${esc(d.phone)}</span>`:''}
+          ${d.notes?`<span>📝 ${esc(d.notes)}</span>`:''}
+        </div>
+      </div>
+      <div class="doc-side">
+        <span class="cls-badge cls-${d.class.replace('+','plus')}">${d.class}</span>
+        <span class="doc-rep">👤 ${esc(d.rep_name)}</span>
+        ${d.rep_name && ME && d.rep_name.startsWith(ME.name)?`<button class="btn-del" title="حذف" onclick="delDoc('${d.id}')">🗑</button>`:''}
+      </div>
+    </div>`).join('');
+}
+async function delDoc(id){
+  if(!confirm('حذف هذا الطبيب من السيرفي؟')) return;
+  try{
+    const r = await rpc('survey_delete',{p_id:id,p_rep_username:ME.username});
+    if(r.ok){ toast('تم الحذف','ok'); refresh(); } else toast('يمكنك حذف سجلاتك فقط','err');
+  }catch(e){ toast('خطأ في الاتصال','err'); }
+}
+
+/* ══════ STATS ══════ */
+const COLORS=['#1B4FD8','#0891B2','#059669','#D97706','#7C3AED','#DC2626','#DB2777','#65A30D'];
+function count(arr,key){ const m={}; arr.forEach(d=>{const k=d[key]||'—'; m[k]=(m[k]||0)+1;}); return Object.entries(m).sort((a,b)=>b[1]-a[1]); }
+function bars(elId, entries, max){
+  $(elId).innerHTML = entries.slice(0,8).map(([k,v],i)=>`
+    <div class="bar-row"><div class="br-lbl" title="${esc(k)}">${esc(k)}</div>
+    <div class="br-track"><div class="br-fill" style="width:${Math.max(8,v/max*100)}%;background:${COLORS[i%COLORS.length]}">${v}</div></div></div>`).join('');
+}
+function renderStats(){
+  const areas=count(ALL,'area'), specs=count(ALL,'specialty'), reps=count(ALL,'rep_name'), cls=count(ALL,'class');
+  $('stat-grid').innerHTML = `
+    <div class="stat-card"><div class="sc-num">${ALL.length}</div><div class="sc-lbl">طبيب مسجّل</div></div>
+    <div class="stat-card"><div class="sc-num">${areas.length}</div><div class="sc-lbl">منطقة</div></div>
+    <div class="stat-card"><div class="sc-num">${specs.length}</div><div class="sc-lbl">اختصاص</div></div>
+    <div class="stat-card"><div class="sc-num">${reps.length}</div><div class="sc-lbl">مندوب مشارك</div></div>`;
+  const max1=Math.max(1,...cls.map(e=>e[1])), max2=Math.max(1,...areas.map(e=>e[1])), max3=Math.max(1,...specs.map(e=>e[1]));
+  bars('cls-bars',cls,max1); bars('area-bars',areas,max2); bars('spec-bars',specs,max3);
+  $('rep-board').innerHTML = reps.length? reps.slice(0,10).map(([k,v],i)=>`
+    <div class="rep-row"><div class="rep-rank ${i===0?'r1':''}">${i===0?'🥇':i+1}</div>
+    <div class="rep-name">${esc(k)}</div><div class="rep-cnt">${v} طبيب</div></div>`).join('')
+    : '<div class="empty" style="padding:20px">لا بيانات بعد</div>';
+}
+
+/* ══════ CSV EXPORT ══════ */
+function exportCSV(){
+  if(!ALL.length) return toast('لا توجد بيانات للتصدير','err');
+  const head=['اسم الطبيب','الاختصاص','المنطقة','الكلاس','الصيدلية القريبة','الهاتف','ملاحظات','المندوب','تاريخ التسجيل'];
+  const csvCell = v => {
+    let s = String(v??'').replace(/"/g,'""');
+    if(/^[=+\-@]/.test(s)) s = "'" + s;
+    return `"${s}"`;
+  };
+  const rows = ALL.map(d=>[d.doctor_name,d.specialty,d.area,d.class,d.nearby_pharmacy,d.phone,d.notes,d.rep_name,new Date(d.created_at).toLocaleDateString('ar-IQ')].map(csvCell).join(','));
+  const blob = new Blob(['﻿'+head.map(csvCell).join(',')+'\n'+rows.join('\n')],{type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'سيرفي_أطباء_الموصل.csv';
+  a.click();
+  toast('✅ تم تصدير الملف','ok');
+}
+
+/* ══════ TOAST ══════ */
+let toastTimer=null;
+function toast(msg, type){
+  const t=$('toast'); t.textContent=msg; t.className=type||'';
+  requestAnimationFrame(()=>t.classList.add('show'));
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),3200);
+}
+
+loadSession();
+</script>
+</body>
+</html>
