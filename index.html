@@ -102,6 +102,21 @@ body[data-role="rep"] .my-stat{display:flex}
 .gap-low{background:var(--amber-l);color:var(--amber)}
 .gap-ok{background:var(--green-l);color:var(--green)}
 
+/* ══════ COMPLETION ══════ */
+#comp-card{display:none;border:2px solid #93C5FD;background:#EFF6FF}
+.comp-item{border-top:1px solid var(--n200);padding:14px 0}
+.comp-item:first-of-type{border-top:none}
+.comp-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.comp-name{font-weight:900;font-size:14px;color:var(--n900)}
+.comp-meta{font-size:11.5px;color:var(--n500)}
+.comp-lbl{font-size:11.5px;font-weight:800;color:var(--n600);margin:8px 0 5px}
+.comp-chips{display:flex;gap:6px;flex-wrap:wrap}
+.comp-chips .type-chip{padding:6px 11px;font-size:12px}
+.comp-inputs{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.comp-inputs input{flex:1;min-width:140px;padding:8px 12px;border:2px solid var(--n200);border-radius:10px;outline:none;font-size:12.5px}
+.comp-save{margin-top:10px;padding:9px 22px;background:var(--brand);color:#fff;border:none;border-radius:10px;font-weight:800;font-size:13px;cursor:pointer}
+.comp-save:disabled{background:var(--n300)}
+
 .dupbox{border-radius:var(--radius);padding:14px 16px;margin-top:10px;font-size:13px;display:none;line-height:1.8}
 .dupbox.dup-exact{display:block;background:var(--red-l);border:2px solid #FCA5A5;color:#991B1B}
 .dupbox.dup-sim{display:block;background:var(--amber-l);border:2px solid #FCD34D;color:#92400E}
@@ -217,6 +232,11 @@ body[data-role="rep"] .my-stat{display:flex}
   <div class="my-stat">
     <div class="ms-icon">🏅</div>
     <div><div class="ms-num" id="my-count">0</div><div class="ms-lbl">طبيباً سجّلتَ حتى الآن — استمر!</div></div>
+  </div>
+  <div class="card" id="comp-card">
+    <h2>🧩 إكمال النواقص <span id="comp-count" style="background:var(--brand);color:#fff;border-radius:12px;padding:1px 10px;font-size:13px"></span></h2>
+    <div class="sub">أطباء سجّلتهم سابقاً وتنقصهم البيانات الجديدة — أكملها وستختفي من القائمة</div>
+    <div id="comp-list"></div>
   </div>
   <div class="card">
     <h2>➕ تسجيل طبيب جديد</h2>
@@ -427,6 +447,7 @@ function enterApp(){
   if(ME.role==='admin') $('hd-user').classList.add('admin');
   $('my-count').textContent = ME.my_count||0;
   if(ME.role==='admin') refresh();
+  loadIncomplete();
 }
 function logout(){ localStorage.removeItem('survey_session'); location.reload(); }
 $('li-pass').addEventListener('keydown',e=>{ if(e.key==='Enter') doLogin(); });
@@ -664,6 +685,86 @@ function renderStats(){
     <div class="rep-row"><div class="rep-rank ${i===0?'r1':''}">${i===0?'🥇':i+1}</div>
     <div class="rep-name">${esc(k)}</div><div class="rep-cnt">${v} طبيب</div></div>`).join('')
     : '<div class="empty" style="padding:20px">لا بيانات بعد</div>';
+}
+
+/* ══════ COMPLETION (missing fields) ══════ */
+const TYPES_LIST = ['ديلر كاش','ساينتفك','KOL','يدور كفت','يدور RDT'];
+const DAYS_LIST = ['السبت','الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة'];
+let COMP = {};
+async function loadIncomplete(){
+  try{
+    const res = await rpc('survey_my_incomplete',{p_token:ME.token});
+    if(res.error==='auth') return sessionExpired();
+    renderIncomplete(res.rows||[]);
+  }catch(e){}
+}
+function renderIncomplete(rows){
+  const card = $('comp-card');
+  if(!rows.length){ card.style.display='none'; return; }
+  card.style.display='block';
+  $('comp-count').textContent = rows.length;
+  COMP = {};
+  $('comp-list').innerHTML = rows.map(d=>{
+    COMP[d.id] = {rx:null, types:new Set(), days:new Set(), needRx:!d.rx_potential, needType:!d.doctor_type};
+    return `
+    <div class="comp-item" id="ci-${d.id}">
+      <div class="comp-head">
+        <span class="comp-name">🩺 ${esc(d.doctor_name)}</span>
+        <span class="comp-meta">${esc(d.specialty)} — ${esc(d.area)} — كلاس ${esc(d.class)}</span>
+      </div>
+      ${!d.rx_potential?`
+      <div class="comp-lbl">📈 حجم الوصف Rx <span style="color:var(--red)">*</span></div>
+      <div class="comp-chips">${['عالي','متوسط','منخفض'].map(r=>`<button type="button" class="type-chip" id="cr-${d.id}-${r}" onclick="compRx('${d.id}','${r}')">${r}</button>`).join('')}</div>`:''}
+      ${!d.doctor_type?`
+      <div class="comp-lbl">🏷️ نوع الطبيب <span style="color:var(--red)">*</span> (متعدد)</div>
+      <div class="comp-chips">${TYPES_LIST.map((t,i)=>`<button type="button" class="type-chip" id="ct-${d.id}-${i}" onclick="compType('${d.id}',${i})">${t}</button>`).join('')}</div>`:''}
+      ${!d.visit_days?`
+      <div class="comp-lbl">⏰ أيام التواجد (اختياري)</div>
+      <div class="comp-chips">${DAYS_LIST.map((y,i)=>`<button type="button" class="type-chip" id="cd-${d.id}-${i}" onclick="compDay('${d.id}',${i})">${y}</button>`).join('')}</div>`:''}
+      <div class="comp-inputs">
+        ${!d.visit_hours?`<input id="ch-${d.id}" placeholder="ساعات التواجد (مثال: 4-8 مساءً)">`:''}
+        ${!d.competitors?`<input id="cc-${d.id}" placeholder="الشركات المنافسة">`:''}
+      </div>
+      <button type="button" class="comp-save" id="cs-${d.id}" onclick="compSave('${d.id}')">💾 حفظ البيانات</button>
+    </div>`;
+  }).join('');
+}
+function compRx(id, r){
+  COMP[id].rx = r;
+  ['عالي','متوسط','منخفض'].forEach(x=>{ const b=$('cr-'+id+'-'+x); if(b) b.classList.toggle('on', x===r); });
+}
+function compType(id, i){
+  const t = TYPES_LIST[i], s = COMP[id].types, b = $('ct-'+id+'-'+i);
+  if(s.has(t)){ s.delete(t); b.classList.remove('on'); } else { s.add(t); b.classList.add('on'); }
+}
+function compDay(id, i){
+  const y = DAYS_LIST[i], s = COMP[id].days, b = $('cd-'+id+'-'+i);
+  if(s.has(y)){ s.delete(y); b.classList.remove('on'); } else { s.add(y); b.classList.add('on'); }
+}
+async function compSave(id){
+  const c = COMP[id];
+  if(c.needRx && !c.rx) return toast('اختر حجم الوصف Rx','err');
+  if(c.needType && !c.types.size) return toast('اختر نوع الطبيب','err');
+  const btn = $('cs-'+id); btn.disabled = true;
+  try{
+    const hoursEl=$('ch-'+id), compEl=$('cc-'+id);
+    const res = await rpc('survey_complete_doctor',{
+      p_token:ME.token, p_id:id,
+      p_rx:c.rx, p_dtype:c.types.size?[...c.types].join('، '):null,
+      p_days:c.days.size?[...c.days].join('، '):null,
+      p_hours:hoursEl?hoursEl.value:null, p_competitors:compEl?compEl.value:null
+    });
+    if(res.ok){
+      toast('✅ تم إكمال بيانات الطبيب','ok');
+      const el=$('ci-'+id); if(el) el.remove();
+      const left = (res.remaining!=null)? res.remaining : Object.keys(COMP).length-1;
+      delete COMP[id];
+      if(left>0){ $('comp-count').textContent = left; } else { $('comp-card').style.display='none'; }
+      if(ME.role==='admin') refresh();
+    } else if(res.reason==='auth'){ return sessionExpired();
+    } else toast('لم يتم الحفظ — حاول مجدداً','err');
+  }catch(e){ toast('خطأ في الاتصال','err'); }
+  btn.disabled = false;
 }
 
 /* ══════ ADMIN: COVERAGE GAPS ══════ */
