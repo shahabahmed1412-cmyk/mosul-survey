@@ -121,6 +121,8 @@ body[data-role="rep"] .my-stat{display:flex}
 .dupbox.dup-exact{display:block;background:var(--red-l);border:2px solid #FCA5A5;color:#991B1B}
 .dupbox.dup-sim{display:block;background:var(--amber-l);border:2px solid #FCD34D;color:#92400E}
 .dupbox.dup-ok{display:block;background:var(--green-l);border:2px solid #6EE7B7;color:#065F46}
+.dupbox.dup-sys{display:block;background:#E0F2FE;border:2px solid #7DD3FC;color:#075985}
+.dup-section+.dup-section{margin-top:10px;padding-top:10px;border-top:1px dashed rgba(0,0,0,.15)}
 .dupbox .dup-title{font-weight:900;display:flex;align-items:center;gap:6px;margin-bottom:4px}
 .dupbox ul{margin:6px 18px 0 0}
 .dupbox .src-tag{font-size:10px;padding:1px 7px;border-radius:8px;background:rgba(0,0,0,.08);font-weight:700;margin-right:4px}
@@ -528,16 +530,34 @@ function renderDup(res){
       سجّله <b>${esc(res.exact.rep_name)}</b> بتاريخ ${d}<br>
       <b>${esc(res.exact.doctor_name)}</b>${res.exact.specialty?' — '+esc(res.exact.specialty):''}${res.exact.area?' — '+esc(res.exact.area):''}${res.exact.class?' — كلاس '+esc(res.exact.class):''}${res.exact.nearby_pharmacy?' — قرب '+esc(res.exact.nearby_pharmacy):''}
       <br>لا حاجة لإعادة تسجيله ✋`;
-  } else if(res.similar && res.similar.length){
-    isDup = false;
-    box.className = 'dupbox dup-sim';
-    box.innerHTML = `<div class="dup-title">⚠️ يوجد أسماء مشابهة — تأكد أنه ليس نفس الطبيب:</div>
+    updateSubmit(); return;
+  }
+  isDup = false;
+  let html = '';
+  if(res.system){
+    const s = res.system;
+    const known = [s.specialty?'الاختصاص: '+esc(s.specialty):null, s.area?'المنطقة: '+esc(s.area):null,
+                   s.clinic?'العيادة: '+esc(s.clinic):null, s.phone?'الهاتف: '+esc(s.phone):null].filter(Boolean);
+    html += `<div class="dup-section">
+      <div class="dup-title">📌 هذا الطبيب موجود في سجلات الشركة${known.length?'':' بالاسم فقط'} — بياناته ناقصة!</div>
+      <b>${esc(s.name)}</b>${known.length?'<br>المعروف عنه: '+known.join(' — '):''}
+      <br>👇 أكمل الحقول أدناه وسجّله ليكتمل ملفه في السيرفي — أنت من سيُكمل بياناته ✍️</div>`;
+    // تعبئة تلقائية للبيانات المعروفة في الحقول الفارغة
+    if(s.specialty && !$('f-spec').value) $('f-spec').value = s.specialty;
+    if(s.area && !$('f-area').value) $('f-area').value = s.area;
+    if(s.phone && !$('f-phone').value) $('f-phone').value = s.phone;
+  }
+  if(res.similar && res.similar.length){
+    html += `<div class="dup-section"><div class="dup-title">⚠️ أسماء مشابهة — تأكد أنه ليس نفس الطبيب:</div>
       <ul>` + res.similar.map(s=>
-        `<li><b>${esc(s.doctor_name)}</b> (${esc(s.specialty||'—')} / ${esc(s.area||'—')}) — سجّله ${esc(s.rep_name)}
+        `<li><b>${esc(s.doctor_name)}</b> (${esc(s.specialty||'—')} / ${esc(s.area||'—')})${s.source==='survey'?' — سجّله '+esc(s.rep_name):''}
          <span class="src-tag">${s.source==='survey'?'السيرفي':'نظام الشركة'}</span></li>`
-      ).join('') + `</ul>إذا كان طبيباً مختلفاً يمكنك المتابعة بشكل طبيعي ✓`;
+      ).join('') + `</ul>إذا كان طبيباً مختلفاً يمكنك المتابعة بشكل طبيعي ✓</div>`;
+  }
+  if(html){
+    box.className = 'dupbox ' + (res.system? 'dup-sys' : 'dup-sim');
+    box.innerHTML = html;
   } else {
-    isDup = false;
     box.className = 'dupbox dup-ok';
     box.innerHTML = `<div class="dup-title">✅ الاسم غير مسجّل — يمكنك المتابعة</div>`;
   }
