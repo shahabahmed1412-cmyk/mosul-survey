@@ -59,6 +59,17 @@ main{max-width:860px;margin:0 auto;padding:18px 14px 60px}
 .panel.active{display:block;animation:fadeIn .25s}
 @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 
+/* deadline banner (rep) */
+#deadline-banner{display:none;border-radius:var(--radius-lg);padding:16px 18px;margin-bottom:14px;box-shadow:var(--shadow);line-height:1.9;font-size:13.5px}
+body[data-role="rep"] #deadline-banner{display:block}
+#deadline-banner.warn{background:#FFF1F2;border:2px solid #FDA4AF;color:#9F1239}
+#deadline-banner.done{background:var(--green-l);border:2px solid #6EE7B7;color:#065F46}
+#deadline-banner .db-title{font-weight:900;font-size:14.5px;display:flex;align-items:center;gap:7px;margin-bottom:4px}
+#deadline-banner .db-progress{height:14px;background:rgba(0,0,0,.08);border-radius:8px;overflow:hidden;margin:8px 0 4px}
+#deadline-banner .db-fill{height:100%;border-radius:8px;background:linear-gradient(90deg,#F43F5E,#FB923C);transition:width .5s;min-width:4px}
+#deadline-banner.done .db-fill{background:var(--green)}
+#deadline-banner .db-nums{font-weight:900}
+
 /* rep own counter */
 .my-stat{display:none;background:linear-gradient(135deg,var(--brand),var(--teal));border-radius:var(--radius-lg);padding:16px 20px;margin-bottom:16px;color:#fff;align-items:center;gap:14px;box-shadow:var(--shadow)}
 body[data-role="rep"] .my-stat{display:flex}
@@ -231,6 +242,7 @@ body[data-role="rep"] .my-stat{display:flex}
 <main>
 <!-- ═══ ADD PANEL ═══ -->
 <div class="panel active" id="p-add">
+  <div id="deadline-banner"></div>
   <div class="my-stat">
     <div class="ms-icon">🏅</div>
     <div><div class="ms-num" id="my-count">0</div><div class="ms-lbl">طبيباً سجّلتَ حتى الآن — استمر!</div></div>
@@ -448,8 +460,30 @@ function enterApp(){
   $('hd-username').textContent = ME.name + (ME.role==='admin'?' (المشرف)':'');
   if(ME.role==='admin') $('hd-user').classList.add('admin');
   $('my-count').textContent = ME.my_count||0;
+  updateDeadlineBanner();
   if(ME.role==='admin') refresh();
   loadIncomplete();
+}
+
+/* ══════ DEADLINE BANNER ══════ */
+const TARGET = 150, DEADLINE_TXT = 'يوم الاثنين';
+function updateDeadlineBanner(){
+  const b = $('deadline-banner');
+  if(!b || ME.role!=='rep') return;
+  const n = ME.my_count||0, pct = Math.min(100, Math.round(n/TARGET*100));
+  if(n >= TARGET){
+    b.className = 'done';
+    b.innerHTML = `<div class="db-title">🎉 أحسنت! أكملت الهدف</div>
+      أنجزت <span class="db-nums">${n}</span> طبيباً من هدف <span class="db-nums">${TARGET}</span> قبل الموعد النهائي (${DEADLINE_TXT}).
+      <div class="db-progress"><div class="db-fill" style="width:100%"></div></div>
+      استمر — كل طبيب إضافي يُحسب لك ✨ وسيتم التحقق من صحة المعلومات.`;
+  } else {
+    b.className = 'warn';
+    b.innerHTML = `<div class="db-title">⏰ تنبيه مهم: اليوم الأخير هو ${DEADLINE_TXT}</div>
+      أنت منجز فقط <span class="db-nums">${n}</span> من <span class="db-nums">${TARGET}</span> طبيباً — المتبقي عليك <span class="db-nums">${TARGET-n}</span>.
+      <div class="db-progress"><div class="db-fill" style="width:${pct}%"></div></div>
+      ⚠️ ستتم <b>محاسبة</b> كل مندوب أرسل أقل من ${TARGET} طبيباً، وسيتم <b>التحقق من صحة المعلومات</b> المدخلة.`;
+  }
 }
 function logout(){ localStorage.removeItem('survey_session'); location.reload(); }
 $('li-pass').addEventListener('keydown',e=>{ if(e.key==='Enter') doLogin(); });
@@ -595,6 +629,7 @@ async function submitDoctor(){
       toast('✅ تم تسجيل الطبيب بنجاح','ok');
       ME.my_count = res.my_count ?? (ME.my_count+1);
       $('my-count').textContent = ME.my_count;
+      updateDeadlineBanner();
       ['f-name','f-spec','f-area','f-hours','f-comp','f-pharm','f-phone','f-notes'].forEach(i=>$(i).value='');
       selClass=null; document.querySelectorAll('.class-chip').forEach(x=>x.classList.remove('sel-Aplus','sel-A','sel-B','sel-C'));
       selTypes.clear(); selDays.clear(); selRx=null;
